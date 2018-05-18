@@ -30,15 +30,29 @@ app.get('/todos', async (req, res) => {
 
 app.get('/todos/:id', async (req, res) => {
   const { id } = req.params;
-
+  
   if (!ObjectId.isValid(id)) return res.status(404).send();
-
+  
   try {
     const todo = await Todo.findById(id);
     if (!todo) return res.status(404).send();
     res.json({ todo });
   } catch (err) {
     res.status(400).send();
+  }
+});
+
+app.delete('/todos/:id', async (req, res) => {
+  const { id } = req.params;
+
+  if(!ObjectId.isValid(id)) return res.status(404).send();
+
+  try {
+    const todo = await Todo.findByIdAndRemove(id);
+    if (!todo) return res.status(404).send();
+    res.json(todo);
+  } catch (err) {
+    res.status(400).send(err);
   }
 });
 
