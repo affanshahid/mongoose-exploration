@@ -23,7 +23,7 @@ describe('POST /todos', () => {
       .post('/todos')
       .send({ text })
       .expect(200)
-      .expect(res => expect(res.body.text).toBe(text))
+      .expect(res => expect(res.body.todo.text).toBe(text))
       .end(async (err, res) => {
         if (err) return done(err);
 

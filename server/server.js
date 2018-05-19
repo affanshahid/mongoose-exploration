@@ -6,6 +6,7 @@ const { pick } = require('lodash');
 const { mongoose } = require('./db/mongoose');
 const { Todo } = require('./models/todo');
 const { User } = require('./models/user');
+const authenticate = require('./middleware/authenticate');
 
 const ObjectId = mongoose.Types.ObjectId;
 const app = express();
@@ -92,6 +93,10 @@ app.post('/users', async (req, res) => {
   } catch (err) {
     res.status(400).send(err);
   }
+});
+
+app.get('/users/me', authenticate, async (req, res) => {
+  res.json(req.user);
 });
 
 module.exports = app;
