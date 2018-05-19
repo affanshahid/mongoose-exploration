@@ -1,3 +1,4 @@
+require('./config/config');
 const express = require('express');
 require('express-async-errors');
 const { pick } = require('lodash');
