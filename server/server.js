@@ -1,5 +1,6 @@
 const express = require('express');
 require('express-async-errors');
+const { pick } = require('lodash');
 
 const { mongoose } = require('./db/mongoose');
 const { Todo } = require('./models/todo');
@@ -30,9 +31,9 @@ app.get('/todos', async (req, res) => {
 
 app.get('/todos/:id', async (req, res) => {
   const { id } = req.params;
-  
+
   if (!ObjectId.isValid(id)) return res.status(404).send();
-  
+
   try {
     const todo = await Todo.findById(id);
     if (!todo) return res.status(404).send();
@@ -45,7 +46,7 @@ app.get('/todos/:id', async (req, res) => {
 app.delete('/todos/:id', async (req, res) => {
   const { id } = req.params;
 
-  if(!ObjectId.isValid(id)) return res.status(404).send();
+  if (!ObjectId.isValid(id)) return res.status(404).send();
 
   try {
     const todo = await Todo.findByIdAndRemove(id);
@@ -53,6 +54,29 @@ app.delete('/todos/:id', async (req, res) => {
     res.json({ todo });
   } catch (err) {
     res.status(400).send(err);
+  }
+});
+
+app.patch('/todos/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const body = pick(req.body, ['text', 'completed']);
+
+  if (!ObjectId.isValid(id)) return res.status(404).send();
+
+  if (body.completed === true) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  try {
+    const todo = await Todo.findByIdAndUpdate(id, { $set: body }, { new: true });
+    if (!todo) return res.status(404).send();
+    res.json({ todo });
+  } catch (err) {
+    res.status(400).send();
   }
 });
 
