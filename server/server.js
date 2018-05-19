@@ -50,7 +50,7 @@ app.delete('/todos/:id', async (req, res) => {
   try {
     const todo = await Todo.findByIdAndRemove(id);
     if (!todo) return res.status(404).send();
-    res.json(todo);
+    res.json({ todo });
   } catch (err) {
     res.status(400).send(err);
   }
