@@ -19,7 +19,7 @@ app.post('/todos', async (req, res) => {
 
   try {
     await todo.save();
-    res.json(todo);
+    res.json({ todo });
   } catch (err) {
     res.status(400).send(err);
   }
@@ -78,6 +78,19 @@ app.patch('/todos/:id', async (req, res) => {
     res.json({ todo });
   } catch (err) {
     res.status(400).send();
+  }
+});
+
+app.post('/users', async (req, res) => {
+  const body = pick(req.body, ['password', 'email']);
+  const user = new User(body);
+
+  try {
+    await user.save();
+    const token = await user.generateAuthToken();
+    res.header('x-auth', token).json({ user });
+  } catch (err) {
+    res.status(400).send(err);
   }
 });
 
