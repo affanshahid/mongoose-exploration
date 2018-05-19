@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest server/**/*.test.js",
+    "test": "jest server/**/*.test.js --watchPathIgnorePatterns playground/**",
     "test-watch": "npm test -- --watch",
-    "dev": "nodemon server/index.js -i *.test.js"
+    "dev": "nodemon server/index.js -i playground/** -i *.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.16.3",
     "express-async-errors": "^2.1.2",
     "jsonwebtoken": "^8.2.1",
