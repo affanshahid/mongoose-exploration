@@ -211,7 +211,7 @@ describe('POST /users', () => {
       .end(done);
   });
 
-  it('should not create user if email in use', done => { 
+  it('should not create user if email in use', done => {
     const email = users[0].email;
     const password = 1211111116;
 
@@ -220,5 +220,54 @@ describe('POST /users', () => {
       .send({ email, password })
       .expect(400)
       .end(done);
+  });
+});
+
+describe('POST /users/login', () => {
+  it('should login user and return auth token', done => {
+    request(app)
+      .post('/users/login')
+      .send({
+        email: users[1].email,
+        password: users[1].password
+      })
+      .expect(200)
+      .expect(res => expect(res.headers).toHaveProperty('x-auth'))
+      .end(async (err, res) => {
+        if (err) return done(err);
+
+        try {
+          const user = await User.findById(users[1]._id);
+          expect(user.tokens[0]).toEqual(expect.objectContaining({
+            access: 'auth',
+            token: res.headers['x-auth']
+          }));
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
+  });
+
+  it('should reject invalid login', done => {
+    request(app)
+      .post('/users/login')
+      .send({
+        email: users[1].email,
+        password: users[1].password + '1234'
+      })
+      .expect(400)
+      .expect(res => expect(res.headers).not.toHaveProperty('x-auth'))
+      .end(async (err, res) => {
+        if (err) return done(err);
+
+        try {
+          const user = await User.findById(users[1]._id);
+          expect(user.tokens.length).toBe(0);
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
   });
 });
