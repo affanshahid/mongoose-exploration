@@ -4,7 +4,7 @@
   "description": "",
   "main": "server/index.js",
   "scripts": {
-    "test": "jest server/**/*.test.js --watchPathIgnorePatterns playground/**",
+    "test": "jest server/tests/.*\\.test\\.js --watchPathIgnorePatterns playground/.*",
     "test-watch": "npm test -- --watch",
     "dev": "nodemon server/index.js -i playground/** -i *.test.js"
   },
