@@ -2,7 +2,7 @@
   "name": "mongodb-exploration",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
     "test": "jest server/**/*.test.js --watchPathIgnorePatterns playground/**",
     "test-watch": "npm test -- --watch",
