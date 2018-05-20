@@ -13,9 +13,10 @@ const app = express();
 
 app.use(express.json());
 
-app.post('/todos', async (req, res) => {
+app.post('/todos', authenticate, async (req, res) => {
   const todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    _creator: req.user._id
   });
 
   try {
@@ -26,18 +27,18 @@ app.post('/todos', async (req, res) => {
   }
 });
 
-app.get('/todos', async (req, res) => {
-  const todos = await Todo.find();
+app.get('/todos', authenticate, async (req, res) => {
+  const todos = await Todo.find({ _creator: req.user._id });
   res.json({ todos });
 });
 
-app.get('/todos/:id', async (req, res) => {
+app.get('/todos/:id', authenticate, async (req, res) => {
   const { id } = req.params;
 
   if (!ObjectId.isValid(id)) return res.status(404).send();
 
   try {
-    const todo = await Todo.findById(id);
+    const todo = await Todo.findOne({ _id: id, _creator: req.user._id });
     if (!todo) return res.status(404).send();
     res.json({ todo });
   } catch (err) {
@@ -45,13 +46,13 @@ app.get('/todos/:id', async (req, res) => {
   }
 });
 
-app.delete('/todos/:id', async (req, res) => {
+app.delete('/todos/:id', authenticate, async (req, res) => {
   const { id } = req.params;
 
   if (!ObjectId.isValid(id)) return res.status(404).send();
 
   try {
-    const todo = await Todo.findByIdAndRemove(id);
+    const todo = await Todo.findOneAndRemove({ _id: id, _creator: req.user._id });
     if (!todo) return res.status(404).send();
     res.json({ todo });
   } catch (err) {
@@ -59,7 +60,7 @@ app.delete('/todos/:id', async (req, res) => {
   }
 });
 
-app.patch('/todos/:id', async (req, res) => {
+app.patch('/todos/:id', authenticate, async (req, res) => {
   const { id } = req.params;
 
   const body = pick(req.body, ['text', 'completed']);
@@ -74,7 +75,7 @@ app.patch('/todos/:id', async (req, res) => {
   }
 
   try {
-    const todo = await Todo.findByIdAndUpdate(id, { $set: body }, { new: true });
+    const todo = await Todo.findOneAndUpdate({ _id: id, _creator: req.user._id }, { $set: body }, { new: true });
     if (!todo) return res.status(404).send();
     res.json({ todo });
   } catch (err) {
